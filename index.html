@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>MNQ TP/SL Planner</title>
+
+<link rel="manifest" href="manifest.json">
+
+<meta name="theme-color" content="#0f0f0f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="TP/SL Planner">
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+
+body{
+background:#0f0f0f;
+color:#fff;
+display:flex;
+justify-content:center;
+align-items:center;
+min-height:100vh;
+padding:20px;
+}
+
+.card{
+width:100%;
+max-width:450px;
+background:#171717;
+border:1px solid #2d2d2d;
+border-radius:24px;
+padding:24px;
+}
+
+h1{
+text-align:center;
+margin-bottom:20px;
+}
+
+label{
+display:block;
+margin-bottom:8px;
+color:#999;
+font-size:14px;
+}
+
+input,select{
+width:100%;
+padding:14px;
+border:none;
+border-radius:12px;
+background:#262626;
+color:white;
+margin-bottom:16px;
+font-size:16px;
+}
+
+.result{
+margin-top:10px;
+padding:20px;
+background:#202020;
+border-radius:16px;
+text-align:center;
+}
+
+.result-value{
+font-size:36px;
+font-weight:bold;
+color:#00ff88;
+margin-top:10px;
+}
+
+.footer{
+margin-top:20px;
+font-size:13px;
+color:#777;
+line-height:1.7;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="card">
+
+<h1>📈 TP / SL Planner</h1>
+
+<label>Contract</label>
+<input type="number" id="contract" value="1" min="1">
+
+<label>Mode</label>
+<select id="mode">
+<option value="moneyToSL">เงินที่ยอมเสีย → จุด SL</option>
+<option value="slToRisk">จุด SL → เงินที่เสี่ยง</option>
+<option value="tpToProfit">จุด TP → กำไร</option>
+</select>
+
+<label id="valueLabel">จำนวนเงิน ($)</label>
+<input type="number" id="value">
+
+<div class="result">
+<div>ผลลัพธ์</div>
+<div class="result-value" id="result">0</div>
+</div>
+
+<div class="footer">
+MNQ = $2 ต่อ Point ต่อ Contract
+</div>
+
+</div>
+
+<script>
+
+const POINT_VALUE = 2;
+
+const contractInput = document.getElementById("contract");
+const modeInput = document.getElementById("mode");
+const valueInput = document.getElementById("value");
+const resultEl = document.getElementById("result");
+const labelEl = document.getElementById("valueLabel");
+
+function calculate(){
+
+const contract = Number(contractInput.value);
+const value = Number(valueInput.value);
+
+if(!contract || !value){
+resultEl.innerHTML = "0";
+return;
+}
+
+let result = 0;
+
+if(modeInput.value === "moneyToSL"){
+result = value / (contract * POINT_VALUE);
+resultEl.innerHTML = result.toFixed(2) + " จุด";
+}
+
+if(modeInput.value === "slToRisk"){
+result = contract * value * POINT_VALUE;
+resultEl.innerHTML = "$" + result.toFixed(2);
+}
+
+if(modeInput.value === "tpToProfit"){
+result = contract * value * POINT_VALUE;
+resultEl.innerHTML = "$" + result.toFixed(2);
+}
+}
+
+function updateLabel(){
+
+if(modeInput.value === "moneyToSL"){
+labelEl.innerHTML = "จำนวนเงินที่ยอมเสีย ($)";
+}
+
+if(modeInput.value === "slToRisk"){
+labelEl.innerHTML = "SL Points";
+}
+
+if(modeInput.value === "tpToProfit"){
+labelEl.innerHTML = "TP Points";
+}
+
+calculate();
+}
+
+contractInput.addEventListener("input", calculate);
+valueInput.addEventListener("input", calculate);
+modeInput.addEventListener("change", updateLabel);
+
+updateLabel();
+
+if("serviceWorker" in navigator){
+navigator.serviceWorker.register("./sw.js");
+}
+
+</script>
+
+</body>
+</html>
